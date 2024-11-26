@@ -164,255 +164,276 @@
     </div>
 
     <div class="notification" id="notification"></div>
+<!DOCTYPE html>
+<!-- Previous HTML and CSS remain exactly the same until the script tag -->
+<script>
+    let gameState = {
+        cash: 1000000,
+        revenue: 0,
+        expenses: 0,
+        profit: 0,
+        assets: 1000000,
+        liabilities: 0,
+        employees: 0,
+        marketShare: 0,
+        productivity: 70,
+        morale: 80,
+        training: 50,
+        month: 1,
+        industry: '',
+        reputation: 50,
+        innovations: 0,
+        customerSatisfaction: 75,
+        achievements: [],
+        marketConditions: {
+            inflation: 7.5,
+            gdpGrowth: 5.2,
+            competitionLevel: 'Low',
+            industryGrowth: 4.5,
+            consumerConfidence: 60
+        }
+    };
 
-    <script>
-        // Enhanced game state
-        let gameState = {
-            cash: 1000000,
-            revenue: 0,
-            expenses: 0,
-            profit: 0,
-            assets: 1000000,
-            liabilities: 0,
-            employees: 0,
-            marketShare: 0,
-            productivity: 70,
-            morale: 80,
-            training: 50,
-            month: 1,
-            industry: '',
-            marketConditions: {
-                inflation: 7.5,
-                gdpGrowth: 5.2,
-                competitionLevel: 'Low',
-                industryGrowth: 4.5
-            }
-        };
-
-        // Enhanced events database
-        const events = {
-            agriculture: [
-                {
-                    description: "Drought season approaching. What will you do?",
-                    choices: [
-                        {
-                            text: "Invest in modern irrigation (KES 500,000)",
-                            effect: {
-                                cash: -500000,
-                                assets: 500000,
-                                productivity: 15,
-                                marketShare: 5
-                            }
-                        },
-                        {
-                            text: "Plant drought-resistant crops",
-                            effect: {
-                                cash: -100000,
-                                revenue: 50000,
-                                marketShare: 2
-                            }
-                        },
-                        {
-                            text: "Take crop insurance",
-                            effect: {
-                                cash: -50000,
-                                liabilities: -20000,
-                                marketShare: 1
-                            }
+    // Industry-specific events database
+    const events = {
+        agriculture: [
+            {
+                description: "El Niño rains are predicted. How will you prepare?",
+                choices: [
+                    {
+                        text: "Install greenhouse systems (KES 800,000)",
+                        effect: {
+                            cash: -800000,
+                            assets: 800000,
+                            productivity: 25,
+                            marketShare: 8
                         }
-                    ]
-                },
-                {
-                    description: "Export opportunity to East African Market",
-                    choices: [
-                        {
-                            text: "Invest in quality certification (KES 300,000)",
-                            effect: {
-                                cash: -300000,
-                                revenue: 200000,
-                                marketShare: 10,
-                                employees: 5
-                            }
-                        },
-                        {
-                            text: "Focus on local market",
-                            effect: {
-                                cash: -50000,
-                                revenue: 80000,
-                                marketShare: 3
-                            }
+                    },
+                    {
+                        text: "Diversify crop portfolio (KES 400,000)",
+                        effect: {
+                            cash: -400000,
+                            revenue: 200000,
+                            marketShare: 5
                         }
-                    ]
-                }
-            ],
-            technology: [
-                {
-                    description: "Digital transformation trend in Kenya",
-                    choices: [
-                        {
-                            text: "Develop new software solution",
-                            effect: {
-                                cash: -400000,
-                                revenue: 300000,
-                                employees: 8,
-                                training: 10
-                            }
-                        },
-                        {
-                            text: "Partner with existing tech company",
-                            effect: {
-                                cash: -200000,
-                                revenue: 150000,
-                                marketShare: 5
-                            }
+                    }
+                ]
+            },
+            {
+                description: "Local farmers' cooperative seeks partnership. Your response?",
+                choices: [
+                    {
+                        text: "Join cooperative (KES 200,000)",
+                        effect: {
+                            cash: -200000,
+                            marketShare: 10,
+                            reputation: 15
                         }
-                    ]
-                }
-            ]
-        };
-
-        // Add more industries and events here...
-
-        function startGame() {
-            const industry = document.getElementById('industry-select').value;
-            if (!industry) {
-                showNotification('Please select an industry!', 'error');
-                return;
+                    },
+                    {
+                        text: "Operate independently",
+                        effect: {
+                            marketShare: -5,
+                            productivity: 10
+                        }
+                    }
+                ]
             }
-            
-            gameState.industry = industry;
-            document.getElementById('setup-screen').style.display = 'none';
-            document.getElementById('game-screen').style.display = 'block';
-            
-            updateDisplay();
-            generateEvent();
-        }
-
-        function generateEvent() {
-            const industryEvents = events[gameState.industry];
-            const event = industryEvents[Math.floor(Math.random() * industryEvents.length)];
-            
-            document.getElementById('current-event').textContent = event.description;
-            
-            const choicesDiv = document.getElementById('choices');
-            choicesDiv.innerHTML = '';
-            
-            event.choices.forEach(choice => {
-                const button = document.createElement('button');
-                button.className = 'choice-button';
-                button.textContent = choice.text;
-                button.onclick = () => makeChoice(choice.effect);
-                choicesDiv.appendChild(button);
-            });
-        }
-
-        function makeChoice(effect) {
-            // Apply effects to game state
-            Object.keys(effect).forEach(key => {
-                if (gameState[key] !== undefined) {
-                    gameState[key] += effect[key];
-                }
-            });
-
-            // Monthly updates
-            updateMonthly();
-            updateDisplay();
-
-            // Check win/lose conditions
-            if (gameState.cash <= 0) {
-                showNotification('Game Over! Your company has gone bankrupt!', 'error');
-                resetGame();
-                return;
+        ],
+        technology: [
+            {
+                description: "Startup competition in Nairobi. What's your strategy?",
+                choices: [
+                    {
+                        text: "Participate and showcase product (KES 300,000)",
+                        effect: {
+                            cash: -300000,
+                            marketShare: 15,
+                            reputation: 20
+                        }
+                    },
+                    {
+                        text: "Focus on current projects",
+                        effect: {
+                            productivity: 15,
+                            revenue: 100000
+                        }
+                    }
+                ]
             }
-
-            if (gameState.profit >= 10000000 && gameState.marketShare >= 20) {
-                showNotification('Congratulations! Your company is ready for IPO at the NSE!', 'success');
-                resetGame();
-                return;
+        ],
+        retail: [
+            {
+                description: "New shopping mall opening nearby. Your move?",
+                choices: [
+                    {
+                        text: "Open new branch (KES 1,000,000)",
+                        effect: {
+                            cash: -1000000,
+                            assets: 1000000,
+                            revenue: 300000,
+                            employees: 5
+                        }
+                    },
+                    {
+                        text: "Enhance existing store (KES 200,000)",
+                        effect: {
+                            cash: -200000,
+                            productivity: 20,
+                            customerSatisfaction: 15
+                        }
+                    }
+                ]
             }
+        ]
+        // Add more industries here
+    };
 
-            generateEvent();
+    function startGame() {
+        const industrySelect = document.getElementById('industry-select');
+        gameState.industry = industrySelect.value;
+        
+        if (!gameState.industry) {
+            showNotification('Please select an industry first!', 'error');
+            return;
         }
 
-        function updateMonthly() {
-            // Update market conditions
-            gameState.marketConditions.inflation += (Math.random() - 0.5) * 2;
-            gameState.marketConditions.gdpGrowth += (Math.random() - 0.5);
-            
-            // Employee costs
-            gameState.expenses += gameState.employees * 50000;
-            
-            // Random market events
-            if (Math.random() < 0.2) {
-                generateMarketEvent();
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'block';
+        
+        updateDisplay();
+        generateEvent();
+    }
+
+    function generateEvent() {
+        const industryEvents = events[gameState.industry];
+        if (!industryEvents || industryEvents.length === 0) {
+            showNotification('No events available for this industry', 'warning');
+            return;
+        }
+
+        const randomEvent = industryEvents[Math.floor(Math.random() * industryEvents.length)];
+        document.getElementById('current-event').textContent = randomEvent.description;
+
+        const choicesDiv = document.getElementById('choices');
+        choicesDiv.innerHTML = '';
+
+        randomEvent.choices.forEach((choice, index) => {
+            const button = document.createElement('button');
+            button.className = 'choice-button';
+            button.textContent = choice.text;
+            button.onclick = () => makeChoice(choice.effect);
+            choicesDiv.appendChild(button);
+        });
+    }
+
+    function makeChoice(effect) {
+        // Apply effects to game state
+        Object.keys(effect).forEach(key => {
+            if (key in gameState) {
+                gameState[key] += effect[key];
             }
+        });
+
+        // Calculate monthly changes
+        gameState.expenses = calculateExpenses();
+        gameState.revenue = calculateRevenue();
+        gameState.profit = gameState.revenue - gameState.expenses;
+        gameState.month++;
+
+        // Check achievements
+        checkAchievements();
+
+        // Update display and generate new event
+        updateDisplay();
+        generateEvent();
+
+        // Show notification of results
+        showNotification(`Month ${gameState.month}: Profit KES ${gameState.profit.toLocaleString()}`, 
+            gameState.profit > 0 ? 'success' : 'warning');
+    }
+
+    function calculateExpenses() {
+        return (gameState.employees * 50000) + // Salary expenses
+               (gameState.assets * 0.02) + // Maintenance costs
+               (gameState.marketShare * 10000); // Marketing costs
+    }
+
+    function calculateRevenue() {
+        return (gameState.marketShare * 100000) * // Base revenue from market share
+               (gameState.productivity / 100) * // Productivity multiplier
+               (1 + gameState.reputation / 100); // Reputation bonus
+    }
+
+    function updateDisplay() {
+        // Update financial metrics
+        document.getElementById('cash').textContent = gameState.cash.toLocaleString();
+        document.getElementById('revenue').textContent = gameState.revenue.toLocaleString();
+        document.getElementById('expenses').textContent = gameState.expenses.toLocaleString();
+        document.getElementById('profit').textContent = gameState.profit.toLocaleString();
+
+        // Update market metrics
+        document.getElementById('market-share').textContent = gameState.marketShare.toFixed(1);
+        document.getElementById('competition').textContent = gameState.marketConditions.competitionLevel;
+        document.getElementById('inflation').textContent = gameState.marketConditions.inflation;
+
+        // Update employee metrics
+        document.getElementById('employees').textContent = gameState.employees;
+        document.getElementById('productivity').textContent = gameState.productivity.toFixed(1);
+        document.getElementById('morale').textContent = gameState.morale.toFixed(1);
+
+        // Update progress bars
+        document.getElementById('health-bar').style.width = `${Math.min(100, (gameState.cash / 1000000) * 100)}%`;
+        document.getElementById('market-trend').style.width = `${gameState.marketShare}%`;
+        document.getElementById('team-progress').style.width = `${gameState.productivity}%`;
+    }
+
+    function showNotification(message, type = 'info') {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.style.display = 'block';
+        
+        // Set color based on type
+        switch(type) {
+            case 'success':
+                notification.style.backgroundColor = '#4CAF50';
+                break;
+            case 'warning':
+                notification.style.backgroundColor = '#ff9800';
+                break;
+            case 'error':
+                notification.style.backgroundColor = '#f44336';
+                break;
+            default:
+                notification.style.backgroundColor = '#2196F3';
         }
 
-        function generateMarketEvent() {
-            const events = [
-                "Market competition increased!",
-                "New government regulations announced",
-                "Economic stimulus package released",
-                "Foreign investment opportunities opened"
-            ];
-            showNotification(events[Math.floor(Math.random() * events.length)], 'info');
-        }
+        // Hide notification after 3 seconds
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 3000);
+    }
 
-        function updateDisplay() {
-            // Update all display elements
-            Object.keys(gameState).forEach(key => {
-                const element = document.getElementById(key);
-                if (element) {
-                    element.textContent = typeof gameState[key] === 'number' ? 
-                        gameState[key].toLocaleString() : gameState[key];
-                }
-            });
-
-            // Update market indicators
-            Object.keys(gameState.marketConditions).forEach(key => {
-                const element = document.getElementById(key.replace(/([A-Z])/g, '-$1').toLowerCase());
-                if (element) {
-                    element.textContent = gameState.marketConditions[key];
-                }
-            });
-        }
-
-        function showNotification(message, type) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.style.backgroundColor = type === 'error' ? '#ff4444' : 
-                                              type === 'success' ? '#4CAF50' : '#2196F3';
-            notification.style.display = 'block';
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
-        }
-
-        function resetGame() {
-            gameState = {
-                cash: 1000000,
-                revenue: 0,
-                expenses: 0,
-                profit: 0,
-                assets: 1000000,
-                liabilities: 0,
-                employees: 0,
-                marketShare: 0,
-                productivity: 70,
-                morale: 80,
-                training: 50,
-                month: 1,
-                industry: '',
-                marketConditions: {
-                    inflation: 7.5,
-                    gdpGrowth: 5.2,
-                    competitionLevel: 'Low',
-                    industryGrowth: 4.5
-                }
-            };
-            document.getElementById('setup-screen').style.display = 'block';
-            document.getElementById('game-screen').style.display = 'none';
-        }
-    </script>
+    function checkAchievements() {
+        achievements.forEach(achievement => {
+            if (!gameState.achievements.includes(achievement.id) && achievement.check(gameState)) {
+                gameState.achievements.push(achievement.id);
+                showNotification(`Achievement Unlocked: ${achievement.name}`, 'success');
+                
+                const achievementsDiv = document.getElementById('achievements');
+                const achievementElement = document.createElement('div');
+                achievementElement.className = 'achievement';
+                achievementElement.innerHTML = `
+                    <span class="achievement-icon">${achievement.name.split(' ')[0]}</span>
+                    <div>
+                        <strong>${achievement.name}</strong>
+                        <p>${achievement.description}</p>
+                    </div>
+                `;
+                achievementsDiv.appendChild(achievementElement);
+            }
+        });
+    }
+</script>
 </body>
 </html>
